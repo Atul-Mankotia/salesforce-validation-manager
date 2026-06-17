@@ -1,0 +1,322 @@
+/* Layout & Basics */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fafafa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Top Navigation */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-placeholder {
+  width: 32px;
+  height: 32px;
+  background-color: #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #6b7280;
+}
+
+.brand-name {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.btn-donate {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-donate:hover {
+  background-color: #fde68a;
+}
+
+.nav-link {
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #111827;
+}
+
+/* Main Content Area */
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* Landing / Login View */
+.landing-container {
+  max-width: 650px;
+  width: 100%;
+  margin-top: 10vh;
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: #0070d2; /* Updated to Salesforce Blue */
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+.landing-description {
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+.login-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.env-label {
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.env-select {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #374151;
+  background-color: white;
+  outline: none;
+}
+
+.env-select:focus {
+  border-color: #0070d2; /* Updated to Salesforce Blue */
+}
+
+.btn-login {
+  background-color: #0070d2; /* Updated to Salesforce Blue */
+  color: white;
+  border: none;
+  padding: 9px 24px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+  background-color: #005fb2; /* Updated to Darker Hover Blue */
+}
+
+/* Dashboard View (Logged In) */
+.dashboard-container {
+  max-width: 900px;
+  width: 100%;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 300;
+  color: #111827;
+  margin: 0;
+}
+
+.connected-badge {
+  color: #166534;
+  background-color: #dcfce7;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.controls-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.controls-row button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.btn-primary { background-color: #0ea5e9; }
+.btn-primary:hover:not(:disabled) { background-color: #0284c7; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-success { background-color: #22c55e; }
+.btn-success:hover { background-color: #16a34a; }
+
+.btn-danger { background-color: #ef4444; }
+.btn-danger:hover { background-color: #dc2626; }
+
+.status-message {
+  color: #4b5563;
+  font-weight: 500;
+  margin-bottom: 20px;
+  background-color: #f3f4f6;
+  padding: 12px;
+  border-radius: 4px;
+  border-left: 4px solid #0070d2; /* Updated to Salesforce Blue */
+}
+
+/* Table Styling */
+.table-wrapper {
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rules-table th {
+  background-color: #f9fafb;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.rules-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eaeaea;
+  color: #374151;
+  font-size: 14px;
+}
+
+.rules-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badges & Buttons */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-inactive {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-action {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* User Details Section (Post-Login) */
+.user-details-section {
+  margin-top: 32px;
+}
+
+.user-details-heading {
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: #0070d2; /* Updated to Salesforce Blue */
+  margin-bottom: 16px;
+}
+
+.user-info-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  row-gap: 8px;
+  margin-bottom: 24px;
+}
+
+.info-label {
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.info-value {
+  color: #9ca3af; 
+  font-size: 14px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+/* Ensure the main content flows vertically when the table is shown */
+.main-content {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.btn-action-activate { background-color: #22c55e; }
+.btn-action-activate:hover { background-color: #16a34a; }
+
+.btn-action-deactivate { background-color: #ef4444; }
+.btn-action-deactivate:hover { background-color: #dc2626; }
