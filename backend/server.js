@@ -152,7 +152,7 @@ app.post('/api/toggle-rule', async (req, res) => {
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Catch-all route to hand off page routing back to React
-app.get('*', (req, res) => {
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
