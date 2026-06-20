@@ -37,7 +37,7 @@ export default function App() {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = `http://localhost:4000/auth/login?env=${environment}`;
+    window.location.href = `/auth/login?env=${environment}`;
   };
 
   const handleLogout = () => {
@@ -54,7 +54,7 @@ export default function App() {
   const fetchRules = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/validation-rules', {
+      const response = await fetch('/api/validation-rules', {
         headers: {
           'access_token': accessToken,
           'instance_url': instanceUrl
@@ -72,7 +72,7 @@ export default function App() {
 
   const toggleRule = async (ruleId, newActive, fullName) => {
     try {
-      const response = await fetch('http://localhost:4000/api/toggle-rule', {
+      const response = await fetch('/api/toggle-rule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

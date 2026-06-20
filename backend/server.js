@@ -3,9 +3,12 @@ const cors = require('cors');
 const axios = require('axios');
 const crypto = require('crypto');
 require('dotenv').config();
+const path = require('path');
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+
+// FIX 1: Open CORS so Render doesn't block the connection
+app.use(cors());
 app.use(express.json());
 
 const store = {};
@@ -23,26 +26,35 @@ app.get('/auth/login', (req, res) => {
     const challenge = generateCodeChallenge(verifier);
     store['verifier'] = verifier;
 
+    // FIX 2: Dynamically grab the current URL (works for both localhost and Render)
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const redirectUri = `${protocol}://${req.get('host')}/auth/callback`;
+
     const authUrl = `${process.env.SF_LOGIN_URL}/services/oauth2/authorize?` +
         `response_type=code` +
         `&client_id=${process.env.SF_CLIENT_ID}` +
-        `&redirect_uri=http://localhost:4000/auth/callback` +
+        `&redirect_uri=${redirectUri}` +
         `&code_challenge=${challenge}` +
         `&code_challenge_method=S256`;
 
     console.log('Auth URL:', authUrl);
     res.redirect(authUrl);
 });
+
 app.get('/auth/callback', async (req, res) => {
     const { code } = req.query;
     const verifier = store['verifier'];
+
+    // FIX 3: Match the dynamic redirect URI used in the login step
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const redirectUri = `${protocol}://${req.get('host')}/auth/callback`;
 
     try {
         const params = new URLSearchParams({
             grant_type: 'authorization_code',
             client_id: process.env.SF_CLIENT_ID,
             client_secret: process.env.SF_CLIENT_SECRET,
-            redirect_uri: 'http://localhost:4000/auth/callback',
+            redirect_uri: redirectUri,
             code: code,
             code_verifier: verifier
         });
@@ -53,18 +65,13 @@ app.get('/auth/callback', async (req, res) => {
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
 
-        // We added "id" here, which Salesforce provides in the token response
         const { access_token, instance_url, id } = response.data;
 
-        // --- NEW: Fetch User and Organization Details ---
-
-        // 1. Get the Username from the Salesforce Identity URL
         const identityResponse = await axios.get(id, {
             headers: { Authorization: `Bearer ${access_token}` }
         });
         const username = identityResponse.data.username;
 
-        // 2. Query the actual Organization Name
         const orgResponse = await axios.get(
             `${instance_url}/services/data/v59.0/query?q=SELECT+Name+FROM+Organization`,
             { headers: { Authorization: `Bearer ${access_token}` } }
@@ -73,21 +80,22 @@ app.get('/auth/callback', async (req, res) => {
 
         console.log(`Login successful! User: ${username}, Org: ${organizationName}`);
 
-        // 3. Append the new details to the React redirect URL
-        const redirectUrl = `http://localhost:3000?access_token=${access_token}&instance_url=${encodeURIComponent(instance_url)}&username=${encodeURIComponent(username)}&organization=${encodeURIComponent(organizationName)}`;
+        // FIX 4: Send the user straight to the root domain ('/') instead of localhost:3000
+        const redirectUrl = `/?access_token=${access_token}&instance_url=${encodeURIComponent(instance_url)}&username=${encodeURIComponent(username)}&organization=${encodeURIComponent(organizationName)}`;
 
         res.redirect(redirectUrl);
 
     } catch (error) {
         console.error('OAuth error:', error.response?.data || error.message);
-        res.redirect('http://localhost:3000?error=auth_failed');
+        // Send back to root with error
+        res.redirect('/?error=auth_failed');
     }
 });
+
 app.get('/api/validation-rules', async (req, res) => {
     const { access_token, instance_url } = req.headers;
 
     try {
-        // FIX: We changed 'FullName' to 'ValidationName' in the query below
         const response = await axios.get(
             `${instance_url}/services/data/v59.0/tooling/query?q=SELECT+Id,ValidationName,Active+FROM+ValidationRule+WHERE+EntityDefinition.QualifiedApiName='Account'`,
             { headers: { Authorization: `Bearer ${access_token}` } }
@@ -95,7 +103,6 @@ app.get('/api/validation-rules', async (req, res) => {
 
         console.log('Raw response:', JSON.stringify(response.data));
 
-        // Map ValidationName to FullName so the React frontend stays happy
         const rules = response.data.records.map(rule => ({
             Id: rule.Id,
             FullName: rule.ValidationName,
@@ -115,17 +122,14 @@ app.post('/api/toggle-rule', async (req, res) => {
     const { ruleId, active } = req.body;
 
     try {
-        // Step 1: Fetch the complete existing Metadata for this specific rule
         const getUrl = `${instance_url}/services/data/v59.0/tooling/sobjects/ValidationRule/${ruleId}`;
         const ruleResponse = await axios.get(getUrl, {
             headers: { Authorization: `Bearer ${access_token}` }
         });
 
-        // Step 2: Grab the existing Metadata and modify ONLY the active flag
         const updatedMetadata = ruleResponse.data.Metadata;
         updatedMetadata.active = active;
 
-        // Step 3: Send the complete, updated Metadata back to Salesforce
         await axios.patch(
             getUrl,
             { Metadata: updatedMetadata },
@@ -144,4 +148,14 @@ app.post('/api/toggle-rule', async (req, res) => {
     }
 });
 
-app.listen(4000, () => console.log('Server running on port 4000'));
+// Serve the React frontend static files
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Catch-all route to hand off page routing back to React
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+// FIX 5: Let Render dynamically set the Port
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
